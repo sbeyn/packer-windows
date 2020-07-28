@@ -1,0 +1,18 @@
+- hosts: all
+  tasks:
+
+  - name: Install all security, critical, and rollup updates without a scheduled task.
+    win_ping:
+      category_names:
+        - SecurityUpdates
+        - CriticalUpdates
+        - UpdateRollups
+
+  - import_roles:
+      name: jborean93.win_openssh
+
+  - import_roles:
+      name: janneojala.nsclient
+    vars:
+      nsclient_settings_password: "{{ lookup('env','NSCLIENT_PASSWORD') }}"
+      nsclient_settings_allowed_hosts: 127.0.0.1,::1

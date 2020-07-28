@@ -1,0 +1,46 @@
+stages:
+  - build
+  - deploy
+
+image: alpine
+
+before_script:
+  - git config --global http.sslVerify false
+
+get_packer:
+  stage: build
+  artifacts:
+    paths:
+    - packer
+  script:
+    - echo "Fetching packer"
+    - wget https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zip
+    - unzip packer_1.5.5_linux_amd64.zip
+    - chmod +x packer
+    - echo "Install ansible"
+    - pip3 install ansible==2.9.1 pywinrm
+    - rm -rf ~/.cache/pip
+
+deploy_windows_2016_base:
+  stage: deploy
+  script:
+    - echo "Deploying Windows 2016 Base"
+    - packer build -force -var-file azure-variables.json azure-windows-2016-base.json
+
+deploy_windows_2016_disks:
+  stage: deploy
+  script:
+    - echo "Deploying Windows 2016 Disks"
+    - packer build -force -var-file azure-variables.json azure-windows-2016-disks.json
+
+deploy_windows_2016_iis:
+  stage: deploy
+  script:
+    - echo "Deploying Windows 2016 iis"
+    - packer build -force -var-file azure-variables.json azure-windows-2016-iis.json
+
+deploy_windows_2019_base:
+  stage: deploy
+  script:
+    - echo "Deploying Windows 2019 Base"
+    - packer build -force -var-file azure-variables.json azure-windows-2019-base.json
